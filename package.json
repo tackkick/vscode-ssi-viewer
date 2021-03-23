@@ -3,6 +3,11 @@
 	"displayName": "SSI(Server Side Include) Viewer",
 	"description": "",
 	"version": "0.0.1",
+	"publisher": "tackkick",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tackkick/vscode-ssi-viewer.git"
+	},
 	"engines": {
 		"vscode": "^1.54.0"
 	},
@@ -10,16 +15,37 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:vscode-ssi-viewer.helloWorld"
+		"onCommand:vscode-ssi-viewer.load",
+		"onCommand:vscode-ssi-viewer.load-with-comment"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "vscode-ssi-viewer.helloWorld",
-				"title": "Hello World"
+				"command": "vscode-ssi-viewer.load",
+				"title": "Load #include",
+				"category": "SSI"
+			},
+			{
+				"command": "vscode-ssi-viewer.load-with-comment",
+				"title": "Load #include with comment",
+				"category": "SSI"
 			}
-		]
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"when": "resourceScheme != vscode-ssi-viewer",
+					"command": "vscode-ssi-viewer.load",
+					"group": "vscode-ssi-viewer@1"
+				},
+				{
+					"when": "resourceScheme != vscode-ssi-viewer",
+					"command": "vscode-ssi-viewer.load-with-comment",
+					"group": "vscode-ssi-viewer@2"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
@@ -30,13 +56,13 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
-		"@types/vscode": "^1.54.0",
 		"@types/glob": "^7.1.3",
 		"@types/mocha": "^8.0.0",
 		"@types/node": "^12.11.7",
+		"@types/vscode": "^1.54.0",
+		"@typescript-eslint/eslint-plugin": "^4.19.0",
+		"@typescript-eslint/parser": "^4.19.0",
 		"eslint": "^7.9.0",
-		"@typescript-eslint/eslint-plugin": "^4.1.1",
-		"@typescript-eslint/parser": "^4.1.1",
 		"glob": "^7.1.6",
 		"mocha": "^8.1.3",
 		"typescript": "^4.0.2",
