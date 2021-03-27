@@ -1,4 +1,4 @@
-# VS Code SSI(Server Side Include) Viewer extention
+# SSI(Server Side Include) Viewer extention
 
 This extension displays the files described by server side include tag [#include file | virtual] in an combined state.  
 
@@ -15,9 +15,3 @@ After installation, the following command will be added to the right-click menu.
 > In the case of virtual, it will search for the file from the root of the workspace.  
 
 ![features](features.png)
-
-## Release Notes
-
-### 0.0.1
-
-- Initial release
