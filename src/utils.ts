@@ -9,7 +9,7 @@ import { workspace, TextDocument } from 'vscode';
  * @returns 
  */
 export function getIncludeFullPath(includeType: string, includeFilePath: string, baseDoc: TextDocument): string {
-	if (includeType === "FILE") {
+	if (includeType === "FILE" && !includeFilePath.startsWith('/')) {
 		//get relative path from the current file.
 		return path.join(path.dirname(baseDoc.fileName), includeFilePath);
 	} else if (includeType === "VIRTUAL") {
@@ -31,15 +31,13 @@ export function getIncludeFullPath(includeType: string, includeFilePath: string,
  * @returns 
  */
 export function getIncludeTextWithComment(text: string, depth: number, type: string, path: string, withComment: boolean): string {
-	const beginComment = `${"  ".repeat((depth - 1))}'# Depth:${depth} # BEGIN INCLUDE ${type.toUpperCase()}: ${path} ${"-".repeat(120)}`.substr(0, 120);
-	const endOfComment = `${"  ".repeat((depth - 1))}'# Depth:${depth} # END__ INCLUDE ${type.toUpperCase()}: ${path} ${"-".repeat(120)}`.substr(0, 120);
-
 	if (withComment) {
+		const beginComment = `${"  ".repeat((depth - 1))}'# Depth:${depth} # BEGIN INCLUDE ${type.toUpperCase()}: ${path} ${"-".repeat(120)}`.substr(0, 120);
+		const endOfComment = `${"  ".repeat((depth - 1))}'# Depth:${depth} # END__ INCLUDE ${type.toUpperCase()}: ${path} ${"-".repeat(120)}`.substr(0, 120);
 		text = `${getCommentText(beginComment)}
 ${text}
 ${getCommentText(endOfComment)}`;
 	}
-
 	return text;
 }
 

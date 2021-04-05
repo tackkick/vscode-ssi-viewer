@@ -10,64 +10,83 @@ export class SsiDocumentContentProvider implements vscode.TextDocumentContentPro
 		this.withComment = withComment;
 	}
 
+	private eol: vscode.EndOfLine = vscode.EndOfLine.CRLF;
+	setEol(eol: vscode.EndOfLine) {
+		this.eol = eol;
+	}
+
 	onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
 	onDidChange = this.onDidChangeEmitter.event;
 
+	async loadInclude(filePath: string, depth: number, withComment: boolean, counter: utils.FileCounter): Promise<string> {
+		try {
+			const baseDoc = await vscode.workspace.openTextDocument(filePath);
+			const replaceDic: { [key: string]: string } = {};
+
+			let baseText = baseDoc.getText();
+			const regex: RegExp = /<!--.*?#include\s+(?<type>file|virtual)\s*=\s*"(?<file>.+?)".*?-->/gi;
+			let match = regex.exec(baseText);
+
+			do {
+				if (!match) { continue; }
+				const includePath = match.groups?.file || "";
+				const includeType = match.groups?.type.toUpperCase() || "";
+
+				let includeFullPath = utils.getIncludeFullPath(includeType, includePath, baseDoc);
+				if (includeFullPath) {
+					depth++;
+					try {
+						await vscode.workspace.fs.stat(vscode.Uri.file(includeFullPath));
+					} catch {
+						counter.incrementFail();
+						const errmsg = `Error: cannot open file: [${includePath}]`;
+						vscode.window.showInformationMessage(errmsg);
+						replaceDic[match[0]] = utils.getCommentText(errmsg);
+						continue;
+					}
+
+					if (includeType === "FILE") {
+						counter.incrementFile();
+					} else {
+						counter.incrementVirtual();
+					}
+					let includeText = await(await this.loadInclude(includeFullPath, depth, withComment, counter));
+					includeText = utils.getIncludeTextWithComment(includeText, depth, includeType, path.basename(includeFullPath), withComment);
+
+					includeText = includeText.trimEnd();
+					//includeText = includeText + ((this.eol === 1) ? '\n' : '\r\n');
+
+					depth--;
+
+					replaceDic[match[0]] = includeText;
+				} else {
+					if (includeType === "FILE" && includePath.startsWith('/')) {
+						counter.incrementFail();
+						const errmsg = `Error: [#include file] does not start with "/": [${includePath}]`;
+						vscode.window.showInformationMessage(errmsg);
+						replaceDic[match[0]] = utils.getCommentText(errmsg);
+						continue;
+					}
+				}
+			} while (match = regex.exec(baseText));
+
+			Object.keys(replaceDic).forEach(key => {
+				baseText = baseText.split(key).join(replaceDic[key]);
+			});
+
+			return baseText;
+		} catch {
+			counter.incrementFail();
+			return "";
+		}
+	};
+
 	async provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
-		let counter = utils.createFileCounter();
-		const result = await loadInclude(uri.path, 0, this.withComment, counter);
+		const counter = utils.createFileCounter();
+		let result = await this.loadInclude(uri.path, 0, this.withComment, counter);
+		result = result.trimEnd();
+		result = result + ((this.eol === 1) ? '\n' : '\r\n');
 		vscode.window.showInformationMessage(counter.getResultText());
 		return result;
 	}
 };
-
-export async function loadInclude(filePath: string, depth: number, withComment: boolean, counter: utils.FileCounter): Promise<string> {
-	try {
-		const baseDoc = await vscode.workspace.openTextDocument(filePath);
-		const replaceDic: { [key: string]: string } = {};
-
-		let baseText = baseDoc.getText();
-		const regex: RegExp = /<!--.*?#include\s+(?<type>file|virtual)\s*=\s*"(?<file>.+?)".*?-->/gi;
-		let match = regex.exec(baseText);
-
-		do {
-			if (!match) { continue; }
-			const includePath = match.groups?.file || "";
-			const includeType = match.groups?.type.toUpperCase() || "";
-
-			let includeFullPath = utils.getIncludeFullPath(includeType, includePath, baseDoc);
-			if (includeFullPath) {
-				depth++;
-				try {
-					await vscode.workspace.fs.stat(vscode.Uri.file(includeFullPath));
-				} catch {
-					counter.incrementFail();
-					const errmsg = `Error: cannot open file: [${includePath}]`;
-					vscode.window.showInformationMessage(errmsg);
-					replaceDic[match[0]] = utils.getCommentText(errmsg);
-					continue;
-				}
-
-				if (includeType === "FILE") {
-					counter.incrementFile();
-				} else {
-					counter.incrementVirtual();
-				}
-				let includeText = await loadInclude(includeFullPath, depth, withComment, counter);
-				includeText = utils.getIncludeTextWithComment(includeText, depth, includeType, path.basename(includeFullPath), withComment);
-				depth--;
-
-				replaceDic[match[0]] = includeText;
-			}
-		} while (match = regex.exec(baseText));
-
-		Object.keys(replaceDic).forEach(key => {
-			baseText = baseText.split(key).join(replaceDic[key]);
-		});
-
-		return baseText;
-	} catch {
-		counter.incrementFail();
-		return "";
-	}
-}

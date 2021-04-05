@@ -1,7 +1,7 @@
 {
 	"name": "vscode-ssi-viewer",
 	"displayName": "SSI(Server Side Include) Viewer",
-	"description": "",
+	"description": "Replace #include tag with actual text.",
 	"icon": "icon.png",
 	"version": "0.0.2",
 	"publisher": "tackkick",
@@ -14,6 +14,14 @@
 	},
 	"categories": [
 		"Other"
+	],
+	"license": "SEE LICENSE IN LICENSE.txt",
+	"keywords": [
+		"asp",
+		"classic asp",
+		"include",
+		"shtml",
+		"ssi"
 	],
 	"activationEvents": [
 		"onCommand:vscode-ssi-viewer.load",
