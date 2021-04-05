@@ -10,9 +10,13 @@ export class SsiDocumentContentProvider implements vscode.TextDocumentContentPro
 		this.withComment = withComment;
 	}
 
-	private eol: vscode.EndOfLine = vscode.EndOfLine.CRLF;
+	private eol: String = "\n";
 	setEol(eol: vscode.EndOfLine) {
-		this.eol = eol;
+		if (eol === vscode.EndOfLine.LF) {
+			this.eol = "\n";
+		} else if (eol === vscode.EndOfLine.CRLF) {
+			this.eol = "\r\n";
+		}
 	}
 
 	onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
@@ -24,7 +28,7 @@ export class SsiDocumentContentProvider implements vscode.TextDocumentContentPro
 			const replaceDic: { [key: string]: string } = {};
 
 			let baseText = baseDoc.getText();
-			const regex: RegExp = /<!--.*?#include\s+(?<type>file|virtual)\s*=\s*"(?<file>.+?)".*?-->/gi;
+			const regex: RegExp = /<!--.*?#include\s+(.+?\s)?(?<type>file|virtual)\s*=\s*"(?<file>.+?)".*?-->/gi;
 			let match = regex.exec(baseText);
 
 			do {
@@ -50,14 +54,10 @@ export class SsiDocumentContentProvider implements vscode.TextDocumentContentPro
 					} else {
 						counter.incrementVirtual();
 					}
-					let includeText = await(await this.loadInclude(includeFullPath, depth, withComment, counter));
+					let includeText = await this.loadInclude(includeFullPath, depth, withComment, counter);
 					includeText = utils.getIncludeTextWithComment(includeText, depth, includeType, path.basename(includeFullPath), withComment);
 
-					includeText = includeText.trimEnd();
-					//includeText = includeText + ((this.eol === 1) ? '\n' : '\r\n');
-
 					depth--;
-
 					replaceDic[match[0]] = includeText;
 				} else {
 					if (includeType === "FILE" && includePath.startsWith('/')) {
@@ -85,7 +85,7 @@ export class SsiDocumentContentProvider implements vscode.TextDocumentContentPro
 		const counter = utils.createFileCounter();
 		let result = await this.loadInclude(uri.path, 0, this.withComment, counter);
 		result = result.trimEnd();
-		result = result + ((this.eol === 1) ? '\n' : '\r\n');
+		result = result + this.eol;
 		vscode.window.showInformationMessage(counter.getResultText());
 		return result;
 	}

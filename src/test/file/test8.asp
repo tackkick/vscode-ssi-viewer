@@ -4,13 +4,7 @@ test8.asp
 2.<!-- xxx #include virtual = "/xxx/xxx1.asp" --><br/>
 3.<!-- #include xxx virtual = "/xxx/xxx1.asp" --><br/>
 4.<!-- #include virtual = "/xxx/xxx1.asp" xxx --><br/>
-5.<!--
-    #include virtual = "/xxx/xxx1.asp"
---><br/>
-6.<!-- #include file = "xxx/xxx1.asp" --><br/>
-7.<!-- xxx #include file = "xxx/xxx1.asp" --><br/>
-8.<!-- #include xxx file = "xxx/xxx1.asp" --><br/>
-9.<!-- #include file = "xxx/xxx1.asp" xxx --><br/>
-a.<!--
-    #include file = "xxx/xxx1.asp"
--->
+5.<!-- #include file = "xxx/xxx1.asp" --><br/>
+6.<!-- xxx #include file = "xxx/xxx1.asp" --><br/>
+7.<!-- #include xxx file = "xxx/xxx1.asp" --><br/>
+8.<!-- #include file = "xxx/xxx1.asp" xxx --><br/>

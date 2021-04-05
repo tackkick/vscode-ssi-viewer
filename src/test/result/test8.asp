@@ -16,6 +16,3 @@ test8.asp
 <br/>
 8.xxx1.asp
 <br/>
-9.xxx1.asp
-<br/>
-a.xxx1.asp
