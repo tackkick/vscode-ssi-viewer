@@ -23,6 +23,7 @@
 			"request": "launch",
 			"args": [
 				"${workspaceFolder}/src/test/file/",
+				"--disable-extensions",
 				"--extensionDevelopmentPath=${workspaceFolder}",
 				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
 			],

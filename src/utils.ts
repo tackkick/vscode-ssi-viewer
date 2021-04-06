@@ -1,6 +1,18 @@
 import * as path from 'path';
 import { workspace, TextDocument } from 'vscode';
 
+export enum IncludeType {
+	file = "FILE",
+	virtual = "VIRTUAL",
+}
+
+export function getIncludeType(type: string): IncludeType {
+	if (type.toUpperCase() === IncludeType.file) {
+		return IncludeType.file;
+	}
+	return IncludeType.virtual;
+}
+
 /**
  * get include full path
  * @param includeType : FILE or VIRTUAL
@@ -8,11 +20,11 @@ import { workspace, TextDocument } from 'vscode';
  * @param baseDoc 
  * @returns 
  */
-export function getIncludeFullPath(includeType: string, includeFilePath: string, baseDoc: TextDocument): string {
-	if (includeType === "FILE") {
+export function getIncludeFullPath(includeType: IncludeType, includeFilePath: string, baseDoc: TextDocument): string {
+	if (includeType === IncludeType.file && !includeFilePath.startsWith('/')) {
 		//get relative path from the current file.
 		return path.join(path.dirname(baseDoc.fileName), includeFilePath);
-	} else if (includeType === "VIRTUAL") {
+	} else if (includeType === IncludeType.virtual) {
 		//get the path from root.
 		const workspacePath = workspace.getWorkspaceFolder(baseDoc.uri)?.uri.path;
 		if (workspacePath) {
@@ -31,15 +43,13 @@ export function getIncludeFullPath(includeType: string, includeFilePath: string,
  * @returns 
  */
 export function getIncludeTextWithComment(text: string, depth: number, type: string, path: string, withComment: boolean): string {
-	const beginComment = `${"  ".repeat((depth - 1))}'# Depth:${depth} # BEGIN INCLUDE ${type.toUpperCase()}: ${path} ${"-".repeat(120)}`.substr(0, 120);
-	const endOfComment = `${"  ".repeat((depth - 1))}'# Depth:${depth} # END__ INCLUDE ${type.toUpperCase()}: ${path} ${"-".repeat(120)}`.substr(0, 120);
-
 	if (withComment) {
+		const beginComment = `${"  ".repeat((depth - 1))}'# Depth:${depth} # BEGIN INCLUDE ${type.toUpperCase()}: ${path} ${"-".repeat(120)}`.substr(0, 120);
+		const endOfComment = `${"  ".repeat((depth - 1))}'# Depth:${depth} # END__ INCLUDE ${type.toUpperCase()}: ${path} ${"-".repeat(120)}`.substr(0, 120);
 		text = `${getCommentText(beginComment)}
 ${text}
 ${getCommentText(endOfComment)}`;
 	}
-
 	return text;
 }
 
@@ -73,8 +83,7 @@ export function getValidUriText(text: string): string {
  * type of FileCounter
  */
 export type FileCounter = {
-	incrementFile(): void,
-	incrementVirtual(): void,
+	incrementFile(type: IncludeType): void,
 	incrementFail(): void,
 	getResultText(): string
 };
@@ -88,8 +97,10 @@ export function createFileCounter(): FileCounter {
 	let countVirtual = 0;
 	let countFail = 0;
 	return {
-		incrementFile() { countFile++; },
-		incrementVirtual() { countVirtual++; },
+		incrementFile(type: IncludeType) {
+			if (type === IncludeType.file) { countFile++; }
+			else if (type === IncludeType.virtual) { countVirtual++; }
+		},
 		incrementFail() { countFail++; },
 		getResultText() { return `#include loaded | file:${countFile} | virtual:${countVirtual} | fail:${countFail}`; }
 	};

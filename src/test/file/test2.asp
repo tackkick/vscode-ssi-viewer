@@ -1,4 +1,4 @@
-test1.asp
+test2.asp
 <br/>
 <!--#include file = "./xxx/xxx1.asp"-->
 <br/>
