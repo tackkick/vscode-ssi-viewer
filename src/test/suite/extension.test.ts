@@ -18,7 +18,7 @@ suite('Extension Test Suite', () => {
 
 	test('test1', async () => {
 		const result = await getResult('test1.asp');
-		await assert.strictEqual(result.actual, result.expected);
+		assert.strictEqual(result.actual, result.expected);
 	});
 
 	test('test2', async () => {
@@ -58,6 +58,11 @@ suite('Extension Test Suite', () => {
 
 	test('test9_error', async () => {
 		const result = await getResult('test9_error.asp');
+		assert.strictEqual(result.actual, result.expected);
+	});
+
+	test('test10', async () => {
+		const result = await getResult('test10.asp');
 		assert.strictEqual(result.actual, result.expected);
 	});
 
