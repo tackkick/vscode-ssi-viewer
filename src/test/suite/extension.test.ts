@@ -66,4 +66,9 @@ suite('Extension Test Suite', () => {
 		assert.strictEqual(result.actual, result.expected);
 	});
 
+	test('test11', async () => {
+		const result = await getResult('test11.asp');
+		assert.strictEqual(result.actual, result.expected);
+	});
+
 });

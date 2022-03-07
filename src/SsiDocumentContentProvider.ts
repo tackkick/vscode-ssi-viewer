@@ -24,10 +24,10 @@ export class SsiDocumentContentProvider implements vscode.TextDocumentContentPro
 			const replaceDic: { [key: string]: string } = {};
 
 			let baseText = baseDoc.getText();
-			const baseRegex: RegExp = /<!--[^]*?#include [^]*?-->/gi;
+			const baseRegex: RegExp = /<!--.+?-->/gis;
 			let baseMatch = null;
 			while (baseMatch = baseRegex.exec(baseText)) {
-				const regex: RegExp = /#include [^]*?(?<type>file|virtual)\s*=\s*("|')?(?<file>[^"'\s]+)("|')?/gi;
+				const regex: RegExp = /#include\s+[\s\S]*?(?<type>file|virtual)\s*=\s*("|')?(?<file>[^"'\s]+)("|')?/gi;
 				const match = regex.exec(baseMatch[0]);
 				if (!match) { continue; }
 				const includePath = match.groups?.file || "";

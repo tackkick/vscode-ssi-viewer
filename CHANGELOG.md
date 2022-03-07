@@ -2,6 +2,10 @@
 
 All notable changes to the "vscode-ssi-viewer" extension will be documented in this file.
 
+## [0.1.1]
+
+- Bug fix
+
 ## [0.1.0]
 
 - Functional improvement

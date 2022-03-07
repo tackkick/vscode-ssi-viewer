@@ -8,3 +8,4 @@ test8.asp
 6.<!-- xxx #include file = "xxx/xxx1.asp" --><br/>
 7.<!-- #include xxx file = "xxx/xxx1.asp" --><br/>
 8.<!-- #include file = "xxx/xxx1.asp" xxx --><br/>
+9.<!-- xxx#include file = "xxx/xxx1.asp" --><br/>
