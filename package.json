@@ -3,7 +3,7 @@
 	"displayName": "SSI(Server Side Include) Viewer",
 	"description": "Replace #include tag with actual text.",
 	"icon": "icon.png",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"publisher": "tackkick",
 	"repository": {
 		"type": "git",
